@@ -1,0 +1,33 @@
+# .terraform directories
+.terraform/
+
+# Terraform plan and state files
+*.tfplan
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+# Local .terraform environment files
+.terraformrc
+terraform.rc
+
+# AWS credentials file (if using AWS as provider)
+.credentials
+
+# Ignore override files as they may contain sensitive data
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore .env files for environment variables
+.env
+
+# Ignore Terraform module cache (if used)
+.terraform/modules/
+
+# Ignore files created by Terraform when using remote backend with state
+.terraform-backend.tf
+
