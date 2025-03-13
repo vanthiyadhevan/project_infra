@@ -1,12 +1,12 @@
 # Role For NodeGroup
 resource "aws_iam_role" "node_grp_role" {
   name = var.node_grp_role_name
-  assume_role_policy = jsondecode(
+  assume_role_policy = jsonencode(
     {
       Version = "2012-10-17"
       Statement = [
         {
-          Action = "stsAssumeRole"
+          Action = "sts:AssumeRole"
           Effect = "Allow"
           Principal = {
             Service = "eks.amazonaws.com"
