@@ -16,9 +16,9 @@ variable "region" {
 variable "bucket" {
   type = map(string)
   default = {
-    "dev"     = "dev-bucket"
-    "staging" = "staging-bucket"
-    "prod"    = "prod-bucket"
+    "dev"     = "dev-bucket-chatapp-state-file"
+    "staging" = "staging-bucket-chatapp-state-file"
+    "prod"    = "prod-bucket-chatapp-state-file"
   }
   description = "bucket for store the infra state files"
 }
@@ -30,8 +30,14 @@ variable "status" {
   description = "Versioning type"
 }
 
-variable "visibility" {
-  type        = string
-  default     = "private"
-  description = "visibility of the content"
-}
+# variable "visibility" {
+#   type        = string
+#   default     = "private"
+#   description = "visibility of the content"
+# }
+
+# variable "visibility_for_report" {
+#   type = string
+#   default = "public"
+#   description = "visibility of the report content"
+# }

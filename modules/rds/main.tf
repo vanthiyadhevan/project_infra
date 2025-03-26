@@ -4,7 +4,7 @@
 #   password_length = 50
 # }
 resource "aws_db_instance" "database" {
-  identifier        = "tf-state-lock-${var.environment}"
+  identifier        = "tf-state-lock"
   instance_class    = var.db_class_type
   db_name           = var.rds_database_name
   allocated_storage = var.db_allocated_size
@@ -18,12 +18,14 @@ resource "aws_db_instance" "database" {
   # vpc_security_group_ids = [modules.vpc.aws_vpc.vpc_main.id]
   # db_subnet_group_name   = modules.vpc.aws_db_subnet_group.pvt_db_subnet_grp.id
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
+  # Allow RDS deletion without requiring a final snapshot
+  skip_final_snapshot = true
 
   tags = {
-    Name        = "tf_state_lock_${var.environment}"
+    Name        = "tf-state-lock-${var.environment}"
     Environment = var.environment
   }
 }

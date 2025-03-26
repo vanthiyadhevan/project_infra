@@ -13,7 +13,7 @@ variable "aws_region" {
 }
 variable "rds_database_name" {
   type        = string
-  default     = "database"
+  default     = "tfstatelockdb"
   description = "rds table name"
 }
 variable "db_allocated_size" {

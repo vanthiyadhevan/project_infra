@@ -9,9 +9,9 @@ resource "aws_dynamodb_table" "dynamodb_for_state_lock" {
     type = "S"
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 
   tags = {
     Name        = "terraform-lock-${var.environment}"
