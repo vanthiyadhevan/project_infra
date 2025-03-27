@@ -1,5 +1,6 @@
 output "vpc_id" {
   value = aws_vpc.vpc_main.id
+  description = "vpc id for environment"
 }
 output "vpc_cidr" {
   value       = aws_vpc.vpc_main.cidr_block

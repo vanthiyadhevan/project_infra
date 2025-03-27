@@ -16,9 +16,9 @@ variable "region" {
 variable "bucket" {
   type = map(string)
   default = {
-    "dev"     = "dev-bucket-chatapp-state-file"
-    "staging" = "staging-bucket-chatapp-state-file"
-    "prod"    = "prod-bucket-chatapp-state-file"
+    "dev"     = "dev-state-file"
+    "staging" = "staging-state-file"
+    "prod"    = "prod-state-file"
   }
   description = "bucket for store the infra state files"
 }

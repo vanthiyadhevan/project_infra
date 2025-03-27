@@ -5,24 +5,24 @@ variable "environment" {
   description = "for all different environment"
 }
 # VPC Related variables
-# variable "vpc_id" {
-#   description = "VPC ID."
-#   type        = string
-#   # default = var.vpc_id
-# }
-# variable "vpc_cidr" {
-#   description = "VPC CIDR_BLOCK"
-#   type        = string
-#   # default = var.vpc_cidr
-# }
-# variable "public_subnet" {
-#   description = "Public subnets"
-#   type        = list(string)
-# }
-# variable "private_subnet" {
-#   description = "private subnets"
-#   type        = list(string)
-# }
+variable "vpc_id" {
+  description = "VPC ID."
+  type        = string
+  # default = var.vpc_id
+}
+variable "vpc_cidr" {
+  description = "VPC CIDR_BLOCK"
+  type        = string
+  # default = var.vpc_cidr
+}
+variable "pub_subnet" {
+  description = "Public subnets"
+  type        = list(string)
+}
+variable "pvt_subnet" {
+  description = "private subnets"
+  type        = list(string)
+}
 
 
 

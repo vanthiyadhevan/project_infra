@@ -18,7 +18,7 @@ output "eks_cluster_endpoint" {
   value       = aws_eks_cluster.chatApp_cluster.endpoint
   description = "eks cluster endpoint"
 }
-output "eks_cluster_security_group_id" {
-  value       = aws_eks_cluster.chatApp_cluster.cluster_security_group_id
-  description = "default cluster security group id"
-}
+# output "eks_cluster_security_group_id" {
+#   value       = aws_eks_cluster.chatApp_cluster.cluster_security_group_id
+#   description = "default cluster security group id"
+# }

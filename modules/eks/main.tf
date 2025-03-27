@@ -38,7 +38,7 @@ resource "aws_eks_cluster" "chatApp_cluster" {
   name = "${var.environment}-${var.eks_cluster_name}-eks"
   # role_arn = aws_iam_role_policy_attachment.chatApp-AmazonEKSClusterPolicy.policy_arn
   role_arn = aws_iam_role.eks-role.arn
-  endpoint = true
+  # endpoint = true
 
   # cluster_endpoint_public_access = true
 
@@ -50,7 +50,8 @@ resource "aws_eks_cluster" "chatApp_cluster" {
   #   ]
   # }
   vpc_config {
-    subnet_ids = concat(data.aws_subnets.private.ids, data.aws_subnets.public.ids)
+    subnet_ids = var.pvt_subnet
+    # subnet_ids = concat(data.aws_subnets.private.ids, data.aws_subnets.public.ids)
     # subnet_ids = [
     #   data.aws_subnets.public[*].id,
     #   data.aws_subnets.private[*].id

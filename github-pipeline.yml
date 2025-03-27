@@ -11,7 +11,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_REGION: ${{ secrets.REGOIN }}
   S3_BUCKET: my-terraform-state-bucket ${{ secrets.S3_BUCKET }}
-  DYNAMODB_TABLE: terraform-lock-table ${{ secrets.DYNAMODB_TABLE }}
+  # DYNAMODB_TABLE: terraform-lock-table ${{ secrets.DYNAMODB_TABLE }}
 
 jobs:
   terraform:
@@ -51,14 +51,14 @@ jobs:
           fi
 
       - name: Terraform Init
-        run: terraform init -backend-config=${{ env.BACKEND_FILE }}
+        run: terraform init -backend-config=${{ environment.BACKEND_FILE }}
 
       - name: Terraform Plan
-        run: terraform plan -var-file=${{ env.ENV }}.tfvars
+        run: terraform plan -var-file=${{ environment.ENV }}.tfvars
 
       - name: Terraform Apply (Only for Merged PRs)
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve -var-file=${{ env.ENV }}.tfvars
+        run: terraform apply -auto-approve -var-file=${{ environment.ENV }}.tfvars
 
       - name: Raise PR to Main if Staging Deploys
         if: github.ref == 'refs/heads/staging'

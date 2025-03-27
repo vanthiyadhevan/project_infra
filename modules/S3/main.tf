@@ -1,10 +1,9 @@
-# provider "aws" {
-#   region = var.region
-# }
+provider "aws" {
+  region = var.region
+}
 
 # Terraform State Files Storing Bucket for All Different Environment
 resource "aws_s3_bucket" "s3_tf_state_file" {
-  # region = var.region
   bucket = "${lower(var.bucket[var.environment])}-vnc"
 
   tags = {
@@ -31,7 +30,7 @@ resource "aws_s3_bucket_versioning" "bucket_version" {
 
 # Test Report files bucket 
 resource "aws_s3_bucket" "report_storing" {
-  bucket = "${lower(var.environment)}-bucket-test-reports-chatapp"
+  bucket = "${lower(var.environment)}-test-reports-chatapp"
 
   # lifecycle {
   #   prevent_destroy = true

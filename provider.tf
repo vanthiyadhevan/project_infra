@@ -1,5 +1,6 @@
 provider "aws" {
-  region = var.region
+  region  = var.region
+  version = "5.90.0"
 }
 # terraform {
 #   backend "s3" {

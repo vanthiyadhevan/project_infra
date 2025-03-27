@@ -14,6 +14,16 @@ variable "my_ip" {
   type        = string
   description = "my router ip"
 }
+# vpc for all
+variable "vpc_id" {
+  type = string
+  description = "vpc id for all"
+}
+variable "pub_subnet" {
+  type = string
+  description = "for all the subets"
+}
+
 # Ami's For All The Server Instances
 variable "amis" {
   type        = list(string)

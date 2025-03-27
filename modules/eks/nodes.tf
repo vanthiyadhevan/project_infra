@@ -45,11 +45,12 @@ resource "aws_eks_node_group" "pvt_node" {
   node_group_name = "${var.environment}-${var.node_name}"
   node_role_arn   = aws_iam_role.node_grp_role.arn
   # subnet_ids      = aws_subnet.pvt_subnet[*].id
+  subnet_ids = var.pvt_subnet
   # subnet_ids = [
   #   data.aws_subnets.private.ids,
   #   data.aws_subnets.public.ids
   # ]
-  subnet_ids = concat(data.aws_subnets.private.ids, data.aws_subnets.public.ids)
+  # subnet_ids = concat(data.aws_subnets.private.ids, data.aws_subnets.public.ids)
   scaling_config {
     desired_size = 1
     max_size     = 2
