@@ -52,9 +52,10 @@ module "eks" {
   depends_on = [module.vpc]
 }
 module "compute_servers" {
-  source = "./modules/compute"
-  my_ip  = var.my_ip
-  vpc_id = module.vpc.vpc_id
+  source     = "./modules/compute"
+  count      = var.environment == "staging" ? 1 : 0
+  my_ip      = var.my_ip
+  vpc_id     = module.vpc.vpc_id
   pub_subnet = module.vpc.pub_subnet[0]
   # subnet_id = module.vpc.pub_subnet[0].id
   depends_on = [
