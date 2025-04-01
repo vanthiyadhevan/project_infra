@@ -33,23 +33,30 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "ENV=prod" >> $GITHUB_ENV
-            echo "BACKEND_FILE=prod.backend.hcl" >> $GITHUB_ENV
+            echo "BACKEND_FILE=environments/prod/prod.backend.hcl" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             echo "ENV=staging" >> $GITHUB_ENV
-            echo "BACKEND_FILE=staging.backend.hcl" >> $GITHUB_ENV
+            echo "BACKEND_FILE=environments/staging/staging.backend.hcl" >> $GITHUB_ENV
           else
-            echo "ENV=dev" >> $GITHUB_ENV
-            echo "BACKEND_FILE=dev.backend.hcl" >> $GITHUB_ENV
+            echo "ERROR: No matching environment for branch ${{ github.ref }}."
+            exit 1
+          fi
+
+      - name: Verify Backend File Exists
+        run: |
+          if [ ! -f "${{ env.BACKEND_FILE }}" ]; then
+            echo "Error: Backend file ${{ env.BACKEND_FILE }} does not exist!"
+            exit 1
           fi
 
       - name: Terraform Init
-        run: terraform init -backend-config=environments/staging/staging.backend.hcl
+        run: terraform init -backend-config=${{ env.BACKEND_FILE }}
 
       - name: Terraform Plan
         id: tf_plan
         run: terraform plan -no-color -out planfile -var="my_ip=${{ env.MY_IP }}"
         continue-on-error: true
       
-      - name: Terraform plan status
+      - name: Terraform Plan Status
         if: steps.tf_plan.outcome == 'failure'
         run: exit 1
