@@ -43,3 +43,19 @@ output "eks_cluster_name" {
 #   # value       = aws_eks_cluster.chatApp_cluster.cluster_security_group_id
 #   description = "default cluster security group id"
 # }
+
+
+# ------------------------
+# COMPUTE CLOUD MODULE
+# ------------------------
+# output "jenkins_pub_ip" {
+#   value = module.compute_servers.jenkins_pub_ip.id
+#   # value       = aws_instance.jenkins_instance.public_ip
+#   description = "jenkins public ip address"
+# }
+
+# output "sonar_pub_ip" {
+#   value = module.compute_servers.sonar_pub_ip.id
+#   # value       = aws_instance.sonar_qube_instance.public_ip
+#   description = "sonar qube public ip"
+# }
