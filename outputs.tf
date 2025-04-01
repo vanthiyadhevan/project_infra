@@ -24,11 +24,10 @@ output "pvt_subnet" {
 #   # value       = aws_eks_cluster.chatApp_cluster.id
 #   description = "eks cluster id"
 # }
-# output "eks_cluster_name" {
-#   value = module.eks.eks_cluster_name.name
-#   # value       = aws_eks_cluster.chatApp_cluster.name
-#   description = "eks cluster name"
-# }
+output "eks_cluster_name" {
+  value = module.eks.eks_cluster_name
+  description = "eks cluster name"
+}
 # output "eks_cluster_certificate_authority" {
 #   value = module.eks.eks_cluster_certificate_authority.certificate_authority
 #   # value       = aws_eks_cluster.chatApp_cluster.certificate_authority

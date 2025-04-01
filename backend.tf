@@ -22,7 +22,7 @@
 
 terraform {
   backend "s3" {
-    bucket  = "staging-state-file-vnc"
+    bucket  = "state-file-all-env-vnc"
     key     = "terraform/staging/terraform.tfstate"
     region  = "us-east-1"
     encrypt = true
