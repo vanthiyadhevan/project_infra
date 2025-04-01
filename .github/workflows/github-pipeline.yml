@@ -1,0 +1,74 @@
+name: Terraform Github Action Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.REGOIN }}
+  S3_BUCKET: ${{ secrets.S3_BUCKET }}
+  MY_IP: ${{ secrets.MY_IP }}
+  # DYNAMODB_TABLE: terraform-lock-table ${{ secrets.DYNAMODB_TABLE }}
+
+jobs:
+  terraform:
+    name: "Apply Terraform Code Changes"
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        # with:
+        #   terraform_version: 1.11.2
+
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v2
+      #   with:
+      #     role-to-assume: arn:aws:iam::YOUR_ACCOUNT_ID:role/TerraformRole
+      #     aws-region: ${{ env.AWS_REGION }}
+
+      - name: Determine Environment
+        id: env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "ENV=prod" >> $GITHUB_ENV
+            echo "BACKEND_FILE=prod.backend.hcl" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            echo "ENV=staging" >> $GITHUB_ENV
+            echo "BACKEND_FILE=staging.backend.hcl" >> $GITHUB_ENV
+          else
+            echo "ENV=dev" >> $GITHUB_ENV
+            echo "BACKEND_FILE=dev.backend.hcl" >> $GITHUB_ENV
+          fi
+
+      - name: Terraform Init
+        run: terraform init -backend-config=${{ environment.BACKEND_FILE }}
+
+      - name: Terraform Plan
+        run: terraform plan -no-color -out planfile 
+        continue-on-error: true
+      
+      - name: Terraform plan status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      # - name: Terraform Apply (Only for Merged PRs)
+      #   if: github.ref == 'refs/heads/main'
+      #   run: terraform apply -auto-approve -var-file=${{ environment.ENV }}.tfvars
+
+      # - name: Raise PR to Main if Staging Deploys
+      #   if: github.ref == 'refs/heads/staging'
+      #   run: |
+      #     gh pr create --title "Promote Staging to Prod" --body "Merging latest staging infrastructure changes to production." --base main --head staging
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
