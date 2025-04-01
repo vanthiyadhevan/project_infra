@@ -1,5 +1,4 @@
-bucket = "prod-bucket-chatapp-vnc"
-key = "prod/terraform.tfstate"
-dynamodb_table = "terraform-lock"
+bucket = "state-file-all-env-vnc"
+key = "terraform/prod/terraform.tfstate"
 region = "us-east-1"
 encrypt = true

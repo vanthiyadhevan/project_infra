@@ -4,10 +4,10 @@ provider "aws" {
 
 # Terraform State Files Storing Bucket for All Different Environment
 resource "aws_s3_bucket" "s3_tf_state_file" {
-  bucket = "${lower(var.bucket[var.environment])}-vnc"
+  bucket = "${lower(var.bucket)}-vnc"
 
   tags = {
-    Name        = "${var.environment}-bucket-state-file-chatapp"
+    Name        = "${var.environment}-state-file-chatapp"
     Environment = var.environment
   }
   # lifecycle {
@@ -71,18 +71,17 @@ resource "aws_s3_bucket_public_access_block" "disable_public_block" {
 #       "Statement" : [
 #         {
 #           "Effect" : "Allow",
-#           # "Principal" : "*",
+#           "Principal" : "*",
 #           "Action" : [
 #             "s3:GetObject",
 #             "s3:ListBucket"
 #           ],
 #           "Resource" : [
-#             "arn:aws:s3:::${aws_s3_bucket.report_storing.arn}",  # Bucket ARN
-#             "arn:aws:s3:::${aws_s3_bucket.report_storing.arn}/*" # Object ARN within the bucket
+#             "${aws_s3_bucket.report_storing.arn}",  # Bucket ARN
+#             "${aws_s3_bucket.report_storing.arn}/*" # Object ARN within the bucket
 #           ]
 #         }
 #       ]
 #     }
-
 #   )
 # }

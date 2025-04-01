@@ -14,12 +14,8 @@ variable "region" {
 
 
 variable "bucket" {
-  type = map(string)
-  default = {
-    "dev"     = "dev-state-file"
-    "staging" = "staging-state-file"
-    "prod"    = "prod-state-file"
-  }
+  type        = string
+  default     = "state-file-all-env"
   description = "bucket for store the infra state files"
 }
 
