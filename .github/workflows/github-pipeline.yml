@@ -47,7 +47,7 @@ jobs:
 
       - name: Terraform Plan
         id: tf_plan
-        run: terraform plan -no-color -out planfile 
+        run: terraform plan -no-color -out planfile -var="my_ip=${{ env.MY_IP }}"
         continue-on-error: true
       
       - name: Terraform plan status
