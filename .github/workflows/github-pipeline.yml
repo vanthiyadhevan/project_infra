@@ -67,35 +67,35 @@ jobs:
         id: tf_plan
         run: terraform plan -no-color -out planfile -var="my_ip=${{ env.MY_IP }}"
 
-      - name: Terraform Apply 
-        id: terraform_apply
-        run: terraform apply -auto-approve -var="my_ip=${{ env.MY_IP }}" -parallelism=1 planfile
+      # - name: Terraform Apply 
+      #   id: terraform_apply
+      #   run: terraform apply -auto-approve -var="my_ip=${{ env.MY_IP }}" -parallelism=1 planfile
 
-      - name: Get kube Config file
-        id: getconfig
-        if: steps.terraform_apply.outcome == 'success'
-        run: aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ env.EKS_CLUSTER }}
+      # - name: Get kube Config file
+      #   id: getconfig
+      #   if: steps.terraform_apply.outcome == 'success'
+      #   run: aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ env.EKS_CLUSTER }}
 
-      - name: Replace AWS Account ID in Cluster Autoscaler YAML
-        id: replace_account_id
-        if: steps.terraform_apply.outcome == 'success' && steps.getconfig.outcome == 'success'
-        run: |
-          sed -i 's|<your-account-id>|${{ secrets.AWS_ACCOUNT_ID }}|g' cluster-autoscaler.yaml
+      # - name: Replace AWS Account ID in Cluster Autoscaler YAML
+      #   id: replace_account_id
+      #   if: steps.terraform_apply.outcome == 'success' && steps.getconfig.outcome == 'success'
+      #   run: |
+      #     sed -i 's|<your-account-id>|${{ secrets.AWS_ACCOUNT_ID }}|g' cluster-autoscaler.yaml
 
-      - name: Apply Cluster Autoscaler YAML
-        id: apply_autoscaler
-        if: steps.replace_account_id.outcome == 'success'
-        run: |
-          kubectl apply -f cluster-autoscaler.yaml
+      # - name: Apply Cluster Autoscaler YAML
+      #   id: apply_autoscaler
+      #   if: steps.replace_account_id.outcome == 'success'
+      #   run: |
+      #     kubectl apply -f cluster-autoscaler.yaml
 
-      - name: Install Ingress Controller
-        id: ingress_install
-        if: steps.apply_autoscaler.outcome == 'success'
-        run: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+      # - name: Install Ingress Controller
+      #   id: ingress_install
+      #   if: steps.apply_autoscaler.outcome == 'success'
+      #   run: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
 
 
-      # - name: Terraform Destroy
-      #   run: terraform destroy -auto-approve -var="my_ip=${{ env.MY_IP }}"
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve -var="my_ip=${{ env.MY_IP }}"
 
       # Step to authenticate GitHub CLI
       # - name: Authenticate GitHub CLI
@@ -112,5 +112,5 @@ jobs:
         #   gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base main --head staging
 
       # Verify that the resources have been destroyed
-      # - name: Verify Destruction
-      #   run: terraform state list
+      - name: Verify Destruction
+        run: terraform state list
