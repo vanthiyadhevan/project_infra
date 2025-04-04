@@ -29,10 +29,24 @@ resource "aws_iam_role" "eks-role" {
 # EKS Policy Attachment
 resource "aws_iam_role_policy_attachment" "chatApp-AmazonEKSClusterPolicy" {
   role       = aws_iam_role.eks-role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-
+  policy_arn = var.eks_policy_arn
+  depends_on = [aws_iam_role.eks-role]
 }
-
+# Create IAM Policy for AssumeRole
+# resource "aws_iam_policy" "eks_assume_role_policy" {
+#   name        = "eks-assume-role-policy"
+#   description = "Allows users in the group to assume the eks-admins-role"
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Effect   = "Allow"
+#         Action   = "sts:AssumeRole"
+#         Resource = "arn:aws:iam::605134458717:role/${aws_iam_role.eks-role.name}"
+#       }
+#     ]
+#   })
+# }
 # Minimum Requirment of EKS
 resource "aws_eks_cluster" "chatApp_cluster" {
   name = "${var.environment}-${var.eks_cluster_name}-eks"
@@ -40,7 +54,7 @@ resource "aws_eks_cluster" "chatApp_cluster" {
   role_arn = aws_iam_role.eks-role.arn
   # endpoint = true
 
-  # cluster_endpoint_public_access = true
+  # cluster_endpoint_public_access = var.boolvalue
 
   version = var.cluster_version
   # vpc_config {
@@ -57,17 +71,22 @@ resource "aws_eks_cluster" "chatApp_cluster" {
     #   data.aws_subnets.private[*].id
     # ]
   }
-  depends_on = [aws_iam_role_policy_attachment.chatApp-AmazonEKSClusterPolicy]
+  depends_on = [
+    aws_iam_role_policy_attachment.chatApp-AmazonEKSClusterPolicy
+    # aws_iam_openid_connect_provider.eks_oidc_connector
+  ]
 }
 
 
-data "tls_certificate" "eks_oidc" {
+data "tls_certificate" "eks_tls" {
   url = aws_eks_cluster.chatApp_cluster.identity[0].oidc[0].issuer
 }
 resource "aws_iam_openid_connect_provider" "eks_oidc_connector" {
-  client_id_list  = ["sts:amazonaws.com"]
-  thumbprint_list = [data.tls_certificate.eks_oidc.certificates[0].sha1_fingerprint]
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks_tls.certificates[0].sha1_fingerprint]
   url             = aws_eks_cluster.chatApp_cluster.identity[0].oidc[0].issuer
+
+  depends_on = [ aws_eks_cluster.chatApp_cluster ]
 }
 
 

@@ -38,8 +38,9 @@ resource "aws_iam_role_policy_attachment" "node-AmazonEC2ContainerRegistryReadOn
 
 }
 
-# AWS node group 
 
+
+# AWS node group 
 resource "aws_eks_node_group" "pvt_node" {
   cluster_name    = aws_eks_cluster.chatApp_cluster.name
   node_group_name = "${var.environment}-${var.node_name}"
@@ -52,8 +53,8 @@ resource "aws_eks_node_group" "pvt_node" {
   # ]
   # subnet_ids = concat(data.aws_subnets.private.ids, data.aws_subnets.public.ids)
   scaling_config {
-    desired_size = 1
-    max_size     = 2
+    desired_size = 2
+    max_size     = 3
     min_size     = 1
   }
 

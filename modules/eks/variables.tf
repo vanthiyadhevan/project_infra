@@ -47,6 +47,16 @@ variable "cluster_version" {
   default     = "1.31"
   description = "Version the cluster we use in this projec"
 }
+variable "boolvalue" {
+  type        = bool
+  default     = true
+  description = "cluster endpoint access both private abd public access"
+}
+variable "eks_policy_arn" {
+  type        = string
+  default     = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  description = "eks cluster role policy"
+}
 # ------------------------
 # NODE GROUP SECTION START
 # ------------------------
@@ -77,6 +87,6 @@ variable "instan_type" {
 
 variable "eks_cluster_autoscaler_name" {
   type        = string
-  default     = "cluser_auto_role"
+  default     = "cluster_auto_role"
   description = "eks cluster autoscaler name"
 }
