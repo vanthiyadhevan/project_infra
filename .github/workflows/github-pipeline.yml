@@ -61,12 +61,12 @@ jobs:
             exit 1
           fi
 
-      - name: Terraform Init
-        run: terraform init -backend-config=${{ env.BACKEND_FILE }}
+      # - name: Terraform Init
+      #   run: terraform init -backend-config=${{ env.BACKEND_FILE }}
 
-      - name: Terraform Plan
-        id: tf_plan
-        run: terraform plan -no-color -out planfile -var="my_ip=${{ env.MY_IP }}"
+      # - name: Terraform Plan
+      #   id: tf_plan
+      #   run: terraform plan -no-color -out planfile -var="my_ip=${{ env.MY_IP }}"
       
       - name: List Files for Debugging
         run: |
