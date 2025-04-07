@@ -6,7 +6,7 @@
 sudo apt-get update -y
 
 # install javajdk-17 for run the jenkins application
-sudo apt install openjdk-17-jdk -y
+sudo apt install openjdk-21-jdk -y
 
 # install maven and unzip
 sudo apt install maven unzip -y
