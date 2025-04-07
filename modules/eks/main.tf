@@ -32,6 +32,11 @@ resource "aws_iam_role_policy_attachment" "chatApp-AmazonEKSClusterPolicy" {
   policy_arn = var.eks_policy_arn
   depends_on = [aws_iam_role.eks-role]
 }
+resource "aws_iam_role_policy_attachment" "chatApp-AmazonEKSServicePolicy" {
+  role       = aws_iam_role.eks-role.name
+  policy_arn = var.eks_service_policy_arn
+  depends_on = [aws_iam_role.eks-role]
+}
 # Create IAM Policy for AssumeRole
 # resource "aws_iam_policy" "eks_assume_role_policy" {
 #   name        = "eks-assume-role-policy"
@@ -42,7 +47,7 @@ resource "aws_iam_role_policy_attachment" "chatApp-AmazonEKSClusterPolicy" {
 #       {
 #         Effect   = "Allow"
 #         Action   = "sts:AssumeRole"
-#         Resource = "arn:aws:iam::605134458717:role/${aws_iam_role.eks-role.name}"
+#         Resource = "arn:aws:iam::<your-account-id>:role/${aws_iam_role.eks-role.name}"
 #       }
 #     ]
 #   })
@@ -72,7 +77,8 @@ resource "aws_eks_cluster" "chatApp_cluster" {
     # ]
   }
   depends_on = [
-    aws_iam_role_policy_attachment.chatApp-AmazonEKSClusterPolicy
+    aws_iam_role_policy_attachment.chatApp-AmazonEKSClusterPolicy,
+    aws_iam_role_policy_attachment.chatApp-AmazonEKSServicePolicy
     # aws_iam_openid_connect_provider.eks_oidc_connector
   ]
 }
@@ -86,7 +92,7 @@ resource "aws_iam_openid_connect_provider" "eks_oidc_connector" {
   thumbprint_list = [data.tls_certificate.eks_tls.certificates[0].sha1_fingerprint]
   url             = aws_eks_cluster.chatApp_cluster.identity[0].oidc[0].issuer
 
-  depends_on = [ aws_eks_cluster.chatApp_cluster ]
+  depends_on = [aws_eks_cluster.chatApp_cluster]
 }
 
 

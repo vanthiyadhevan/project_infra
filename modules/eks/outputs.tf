@@ -22,3 +22,6 @@ output "eks_cluster_endpoint" {
 #   value       = aws_eks_cluster.chatApp_cluster.cluster_security_group_id
 #   description = "default cluster security group id"
 # }
+output "node_grp" {
+  value = aws_eks_node_group.pvt_node
+}

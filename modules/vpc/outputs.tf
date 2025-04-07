@@ -1,5 +1,5 @@
 output "vpc_id" {
-  value = aws_vpc.vpc_main.id
+  value       = aws_vpc.vpc_main.id
   description = "vpc id for environment"
 }
 output "vpc_cidr" {
@@ -42,3 +42,4 @@ output "nat_gateway_id" {
 # output "public_subnet" {
 #   value = var.pub_subnet_cidr
 # }
+

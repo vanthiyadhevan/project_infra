@@ -6,7 +6,8 @@ resource "aws_vpc" "vpc_main" {
   cidr_block = var.vpc_cidr[var.environment]
 
   enable_dns_hostnames = true
-  
+  enable_dns_support   = true
+
   tags = {
     Name        = "${var.environment}-VPC"
     Environment = var.environment

@@ -57,6 +57,11 @@ variable "eks_policy_arn" {
   default     = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   description = "eks cluster role policy"
 }
+variable "eks_service_policy_arn" {
+  type        = string
+  default     = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+  description = "The ARN of the AWS managed policy for the Amazon EKS service role"
+}
 # ------------------------
 # NODE GROUP SECTION START
 # ------------------------

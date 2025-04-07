@@ -25,7 +25,7 @@ output "pvt_subnet" {
 #   description = "eks cluster id"
 # }
 output "eks_cluster_name" {
-  value = module.eks.eks_cluster_name
+  value       = module.eks.eks_cluster_name
   description = "eks cluster name"
 }
 # output "eks_cluster_certificate_authority" {
