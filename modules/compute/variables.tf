@@ -111,6 +111,14 @@ variable "jenkins_s3_attach_name" {
   default     = "jenkinss3attach"
   description = "attache the role and policy arn to jenkins"
 }
+# -----------------------------
+# ecr role and policy creation
+# -----------------------------
+variable "jenkins_ecr_role_name" {
+  type        = string
+  default     = "ecr-role"
+  description = "ecr role name"
+}
 
 # sonar qube security group
 variable "sonar_qube_name" {

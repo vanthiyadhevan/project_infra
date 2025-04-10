@@ -129,6 +129,27 @@ resource "aws_iam_policy_attachment" "jenkins_s3_attach" {
   policy_arn = aws_iam_policy.jenkins_s3_policy.arn
   roles      = [aws_iam_role.jenkins_s3_access.name]
 }
+# -----------------------------------------------------
+# Jenkins Role createion For ECR Access
+# -----------------------------------------------------
+resource "aws_iam_role" "jenkins_ecr_access" {
+  name = var.jenkins_ecr_role_name
+  assume_role_policy = jsonencode(
+    {
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Effect = "Allow",
+          Principal = {
+            Service = "ec2.amazonaws.com"
+          },
+          Action = "sts:AssumeRole"
+        }
+      ]
+    }
+  )
+}
+
 resource "aws_iam_instance_profile" "jenkins_instance_profile" {
   name = var.jenkins_insta_profile_name
   role = aws_iam_role.jenkins_s3_access.name
