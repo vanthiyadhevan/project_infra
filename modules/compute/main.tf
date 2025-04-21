@@ -130,25 +130,51 @@ resource "aws_iam_policy_attachment" "jenkins_s3_attach" {
   roles      = [aws_iam_role.jenkins_s3_access.name]
 }
 # -----------------------------------------------------
-# Jenkins Role createion For ECR Access
+# Jenkins Role creation For ECR Access
 # -----------------------------------------------------
-resource "aws_iam_role" "jenkins_ecr_access" {
-  name = var.jenkins_ecr_role_name
-  assume_role_policy = jsonencode(
-    {
-      Version = "2012-10-17",
-      Statement = [
-        {
-          Effect = "Allow",
-          Principal = {
-            Service = "ec2.amazonaws.com"
-          },
-          Action = "sts:AssumeRole"
-        }
-      ]
-    }
-  )
-}
+# resource "aws_iam_role" "jenkins_ecr_access" {
+#   name = var.jenkins_ecr_role_name
+#   assume_role_policy = jsonencode(
+#     {
+#       Version = "2012-10-17",
+#       Statement = [
+#         {
+#           Effect = "Allow",
+#           Principal = {
+#             Service = "ec2.amazonaws.com"
+#           },
+#           Action = "sts:AssumeRole"
+#         }
+#       ]
+#     }
+#   )
+# }
+# resource "aws_iam_policy" "jenkins_ecr_policy" {
+#   name        = var.jenkins_ecr_role_name
+#   description = "Policy to allow Jenkins access to ECR"
+#   policy = jsonencode(
+#     {
+#       Version = "2012-10-17",
+#       Statement = [
+#         {
+#           Effect = "Allow",
+#           Action = [
+#             "ecr:GetAuthorizationToken",
+#             "ecr:BatchCheckLayerAvailability",
+#             "ecr:GetDownloadUrlForLayer",
+#             "ecr:BatchGetImage"
+#           ],
+#           Resource = "*"
+#         }
+#       ]
+#     }
+#   )
+# }
+# resource "aws_iam_policy_attachment" "jenkins_ecr_attach" {
+#   name       = var.jenkins_s3_attach_name
+#   policy_arn = aws_iam_policy.jenkins_ecr_policy.arn
+#   roles      = [aws_iam_role.jenkins_ecr_access.name]
+# }
 
 resource "aws_iam_instance_profile" "jenkins_instance_profile" {
   name = var.jenkins_insta_profile_name
@@ -159,11 +185,11 @@ resource "aws_iam_instance_profile" "jenkins_instance_profile" {
 # Jenkins instance Creation
 # ----------------------------
 resource "aws_instance" "jenkins_instance" {
-  ami                  = var.amis[0]
-  instance_type        = var.inst_type[0]
+  ami           = var.amis[0]
+  instance_type = var.inst_type[0]
   # subnet_id            = data.aws_subnet.pub_subnet.id
   # subnet_id = aws_subnet.pub_subnet.id
-  subnet_id = var.pub_subnet
+  subnet_id            = var.pub_subnet
   iam_instance_profile = aws_iam_instance_profile.jenkins_instance_profile.name
   #   security_groups = aws_security_group.jenkins.id
   # vpc_security_group_ids = data.aws_security_group.jenkins.id

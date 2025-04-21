@@ -43,6 +43,7 @@ module "vpc" {
 }
 module "eks" {
   source     = "./modules/eks"
+  # count      = var.environment == "staging" ? 1 : 0
   vpc_id     = module.vpc.vpc_id
   vpc_cidr   = module.vpc.vpc_cidr # Ensure this is a valid attribute in vpc module
   pub_subnet = module.vpc.pub_subnet

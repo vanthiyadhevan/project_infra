@@ -16,11 +16,11 @@ variable "my_ip" {
 }
 # vpc for all
 variable "vpc_id" {
-  type = string
+  type        = string
   description = "vpc id for all"
 }
 variable "pub_subnet" {
-  type = string
+  type        = string
   description = "for all the subets"
 }
 
