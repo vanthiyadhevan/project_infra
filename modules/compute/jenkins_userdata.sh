@@ -72,6 +72,9 @@ sudo newgrp docker
 
 sudo usermode -aG docker jenkins
 
+# --------------------------------------
+# Trivy installation on ubuntu server
+# --------------------------------------
 sudo apt-get install wget apt-transport-https gnupg lsb-release -y 
 
 wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
@@ -80,4 +83,15 @@ echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.
 sudo apt-get update
 
 sudo apt-get install trivy -y
+
+# --------------------------------------
+# Install Helm on ubuntu server
+# --------------------------------------
+
+curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+sudo apt-get install apt-transport-https --yes
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+sudo apt-get update
+sudo apt-get install helm -y
+# --------------------------------------
 
