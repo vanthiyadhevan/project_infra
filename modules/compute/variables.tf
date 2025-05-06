@@ -33,7 +33,7 @@ variable "amis" {
 # Instance Types for all the Servers
 variable "inst_type" {
   type    = list(string)
-  default = ["t3.medium", "t2.micro"]
+  default = ["t2.micro", "t2.micro"]
 }
 # Volume size all type of instances
 variable "volume_size" {
