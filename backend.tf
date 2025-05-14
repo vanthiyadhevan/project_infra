@@ -1,42 +1,21 @@
-# terraform {
-#   backend "s3" {
-#     bucket         = "staging-bucket-${var.environment}"
-#     key            = "state/${var.environment}/terraform.tfstate"
-#     dynamodb_table = "terraform-lock-${var.environment}"
-#     encrypt        = true
-#     region         = var.region
-#   }
-# }
+# This file is used to configure the backend for Terraform state management.
+# It specifies that the state will be stored in an S3 bucket and uses DynamoDB for state locking.
+# The backend configuration is set up for the staging environment.
+# The S3 bucket is named "state-file-all-env-vnc" and the state file will be stored at "terraform/staging/terraform.tfstate".
+# The DynamoDB table used for state locking is "terraform-lock-staging".
+# The region for both the S3 bucket and DynamoDB table is set to "us-east-1".
+# The state file is encrypted for security.
+# The backend configuration is essential for managing the state of your Terraform infrastructure.
+# It allows for collaboration and ensures that the state is consistent across different environments.
 
-# Define the backend for storing the Terraform state
-# terraform {
-#   backend "s3" {
-#     bucket = "${var.environment}-${var.name_of_bucket}"
-#     key    = "${var.environment}-${var.state_key_file}"
-#     # use_lockfile = "${var.environment}-${var.backend_db_name}"
-#     # use_lockfile = true
-#     encrypt = true
-#     region  = var.region
-#   }
-# }
 
 terraform {
   backend "s3" {
-    bucket  = "state-file-all-env-vnc"
-    key     = "terraform/staging/terraform.tfstate"
+    bucket = "state-file-all-env-vnc"
+    key    = "terraform/staging/terraform.tfstate"
+    # dynamodb_table = "terraform-lock-staging"
     region  = "us-east-1"
     encrypt = true
   }
 }
 
-# Reference the remote state from an S3 bucket
-# data "terraform_remote_state" "state" {
-#   backend = "s3"
-#   config = {
-#     bucket         = "${var.environment}-${var.name_of_bucket}"
-#     key            = "${var.environment}-${var.state_key_file}"
-#     dynamodb_table = "${var.environment}-${var.backend_db_name}"
-#     encrypt        = true
-#     region         = "${var.region}"
-#   }
-# }

@@ -25,15 +25,3 @@ variable "status" {
   default     = "Enabled"
   description = "Versioning type"
 }
-
-# variable "visibility" {
-#   type        = string
-#   default     = "private"
-#   description = "visibility of the content"
-# }
-
-# variable "visibility_for_report" {
-#   type = string
-#   default = "public"
-#   description = "visibility of the report content"
-# }

@@ -1,11 +1,6 @@
 name: Terraform Github Action Pipeline
 
 on:
-  # Uncomment below if you want it to trigger on push as well
-  # push:
-  #   branches:
-  #     - main
-  #     - staging
   workflow_dispatch:
     inputs:
       tf_action:
@@ -47,47 +42,16 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Determine Environment
-        id: env
-        run: |
-          BRANCH_NAME="${{ github.ref_name }}"
-          echo "Branch name is $BRANCH_NAME"
-
-          if [[ "$BRANCH_NAME" == "main" ]]; then
-            echo "ENV=prod" >> $GITHUB_ENV
-            echo "BACKEND_FILE=environments/prod/prod.backend.hcl" >> $GITHUB_ENV
-          elif [[ "$BRANCH_NAME" == "staging" ]]; then
-            echo "ENV=staging" >> $GITHUB_ENV
-            echo "BACKEND_FILE=environments/staging/staging.backend.hcl" >> $GITHUB_ENV
-          else
-            echo "ERROR: No matching environment for branch $BRANCH_NAME."
-            exit 1
-          fi
-
-      - name: Verify Backend File Exists
-        run: |
-          if [ ! -f "${{ env.BACKEND_FILE }}" ]; then
-            echo "Error: Backend file ${{ env.BACKEND_FILE }} does not exist!"
-            exit 1
-          fi
-
       - name: Terraform Init
-        run: terraform init -backend-config=${{ env.BACKEND_FILE }}
+        run: terraform init 
 
       - name: Terraform Plan
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.tf_action == 'apply'
+        if: ${{ github.event.inputs.tf_action == 'apply' }}
         id: tf_plan
         run: terraform plan -no-color -out planfile -var="my_ip=${{ env.MY_IP }}"
 
-      - name: List Files for Debugging
-        run: |
-          echo "Current working directory:"
-          pwd
-          echo "Listing all files recursively:"
-          find . -type f
-
       - name: Terraform Apply 
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.tf_action == 'apply'
+        if: ${{ github.event.inputs.tf_action == 'apply' }}
         id: terraform_apply
         run: terraform apply -auto-approve -var="my_ip=${{ env.MY_IP }}" -parallelism=1 planfile
 
@@ -114,32 +78,39 @@ jobs:
         run: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
 
       - name: Terraform Destroy
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.tf_action == 'destroy'
+        if: ${{ github.event.inputs.tf_action == 'destroy' }}
         id: terraform_destroy
         run: terraform destroy -auto-approve -var="my_ip=${{ env.MY_IP }}"
 
       - name: Verify Destruction
+        if: ${{ github.event.inputs.tf_action == 'destroy' }}
+        id: verify_destruction
         run: terraform state list || echo "No resources found (possibly already destroyed)"
 
   notify:
-    name: "Send Slack Notification"
-    runs-on: ubuntu-latest
-    needs: terraform
-    if: always()
-    env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  name: "Send Slack Notification"
+  runs-on: ubuntu-latest
+  needs: terraform
+  if: always()
+  env:
+    SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    TF_ACTION: ${{ github.event.inputs.tf_action }}
 
-    steps:
-      - name: Send Slack Notification
-        run: |
-          if [ "${{ needs.terraform.outputs.result }}" == "success" ]; then
-            STATUS="success"
-            MESSAGE="Infrastructure Creation completed successfully! And Pull Request created to Main Branch."
-          else
-            STATUS="failure"
-            MESSAGE="The Infrastructure Creation failed! And no Pull Request created to Main Branch."
-          fi
+  steps:
+    - name: Send Slack Notification
+      run: |
+        if [ "${{ needs.terraform.result }}" == "success" ]; then
+          STATUS="SUCCESS"
+          MESSAGE="Terraform *${TF_ACTION}* completed successfully."
+        elif [ "${{ needs.terraform.result }}" == "failure" ]; then
+          STATUS="FAILURE"
+          MESSAGE="Terraform *${TF_ACTION}* failed!"
+        else
+          STATUS="UNKNOWN"
+          MESSAGE="Terraform *${TF_ACTION}* completed with unknown status."
+        fi
 
-          curl -X POST -H 'Content-type: application/json' --data "{
-            \"text\": \"Task Status: $STATUS\n$MESSAGE\"
-          }" $SLACK_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data "{
+          \"text\": \"*Terraform Pipeline Notification*\nAction: ${TF_ACTION}\nStatus: ${STATUS}\n${MESSAGE}\"
+        }" $SLACK_WEBHOOK_URL
+

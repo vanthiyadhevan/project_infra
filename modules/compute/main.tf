@@ -1,34 +1,9 @@
-# provider "aws" {
-#   version = "5.90.0"
-# }
-
-# --------------------------------------
-# Data Sourcing From Existing Resources
-# --------------------------------------
-
-# data "aws_vpc" "vpc_main" {
-#   filter {
-#     name   = "tag:Name"
-#     values = ["${var.environment}-VPC"]
-#   }
-# }
-
-# data "aws_subnet" "pub_subnet" {
-#   filter {
-#     name   = "tag:Name"
-#     values = ["${var.environment}-pub-subnet-1"]
-#   }
-
-# }
-
 # ---------------------------------
 # Jenkins Security Group Creation
 # ---------------------------------
 resource "aws_security_group" "jenkins" {
   name        = "${var.environment}-${var.jenkins_sec_grp_name}-SG"
   description = "Allow Jenkins to access from 8080"
-  # vpc_id      = data.aws_vpc.vpc_main.id
-  # vpc_id      = aws_vpc.vpc_main.id
   vpc_id = var.vpc_id
 
   tags = {
@@ -63,14 +38,7 @@ resource "aws_security_group_rule" "sonar_jenkins_access" {
   security_group_id        = aws_security_group.jenkins.id
   source_security_group_id = aws_security_group.sonar_qube.id
 }
-# resource "aws_vpc_security_group_ingress_rule" "sonar_jenkins_access" {
-#   security_group_id = aws_security_group.jenkins.id
-#   # security_groups      = [aws_security_group.sonar_qube.id]
-#   source_security_group_ids = [aws_security_group.sonar_qube.id]
-#   from_port         = var.jenkins_port
-#   to_port           = var.jenkins_port
-#   ip_protocol       = var.ip_protocol_name
-# }
+
 
 # Jenkins egress rule (allow all outbound traffic)
 resource "aws_vpc_security_group_egress_rule" "jenkins_egress" {
@@ -100,6 +68,8 @@ resource "aws_iam_role" "jenkins_s3_access" {
   )
 }
 
+# Create the policy to allow Jenkins access to the S3 bucket
+# This policy allows Jenkins to access the S3 bucket for test reports
 resource "aws_iam_policy" "jenkins_s3_policy" {
   name        = var.jenkins_s3_policy_name
   description = "Policy to allow Jenkins access to a specific S3 bucket"
@@ -123,59 +93,13 @@ resource "aws_iam_policy" "jenkins_s3_policy" {
     }
   )
 }
-
+# Attach the policy to the role
 resource "aws_iam_policy_attachment" "jenkins_s3_attach" {
   name       = var.jenkins_s3_attach_name
   policy_arn = aws_iam_policy.jenkins_s3_policy.arn
   roles      = [aws_iam_role.jenkins_s3_access.name]
 }
-# -----------------------------------------------------
-# Jenkins Role creation For ECR Access
-# -----------------------------------------------------
-# resource "aws_iam_role" "jenkins_ecr_access" {
-#   name = var.jenkins_ecr_role_name
-#   assume_role_policy = jsonencode(
-#     {
-#       Version = "2012-10-17",
-#       Statement = [
-#         {
-#           Effect = "Allow",
-#           Principal = {
-#             Service = "ec2.amazonaws.com"
-#           },
-#           Action = "sts:AssumeRole"
-#         }
-#       ]
-#     }
-#   )
-# }
-# resource "aws_iam_policy" "jenkins_ecr_policy" {
-#   name        = var.jenkins_ecr_role_name
-#   description = "Policy to allow Jenkins access to ECR"
-#   policy = jsonencode(
-#     {
-#       Version = "2012-10-17",
-#       Statement = [
-#         {
-#           Effect = "Allow",
-#           Action = [
-#             "ecr:GetAuthorizationToken",
-#             "ecr:BatchCheckLayerAvailability",
-#             "ecr:GetDownloadUrlForLayer",
-#             "ecr:BatchGetImage"
-#           ],
-#           Resource = "*"
-#         }
-#       ]
-#     }
-#   )
-# }
-# resource "aws_iam_policy_attachment" "jenkins_ecr_attach" {
-#   name       = var.jenkins_s3_attach_name
-#   policy_arn = aws_iam_policy.jenkins_ecr_policy.arn
-#   roles      = [aws_iam_role.jenkins_ecr_access.name]
-# }
-
+# Attach the role to the instance profile
 resource "aws_iam_instance_profile" "jenkins_instance_profile" {
   name = var.jenkins_insta_profile_name
   role = aws_iam_role.jenkins_s3_access.name
@@ -187,12 +111,8 @@ resource "aws_iam_instance_profile" "jenkins_instance_profile" {
 resource "aws_instance" "jenkins_instance" {
   ami           = var.amis[0]
   instance_type = var.inst_type[0]
-  # subnet_id            = data.aws_subnet.pub_subnet.id
-  # subnet_id = aws_subnet.pub_subnet.id
   subnet_id            = var.pub_subnet
   iam_instance_profile = aws_iam_instance_profile.jenkins_instance_profile.name
-  #   security_groups = aws_security_group.jenkins.id
-  # vpc_security_group_ids = data.aws_security_group.jenkins.id
   vpc_security_group_ids = [aws_security_group.jenkins.id]
   key_name               = var.key_pair_name
 
@@ -218,8 +138,6 @@ resource "aws_instance" "jenkins_instance" {
 resource "aws_security_group" "sonar_qube" {
   name        = "${var.environment}-${var.sonar_qube_name}-SG"
   description = "Allow SonarQube browser access"
-  # vpc_id      = data.aws_vpc.vpc_main.id
-  # vpc_id      = aws_vpc.vpc_main.id
   vpc_id = var.vpc_id
 
   tags = {
@@ -253,13 +171,7 @@ resource "aws_security_group_rule" "from_jenkins_to_sonar" {
   security_group_id        = aws_security_group.sonar_qube.id
   source_security_group_id = aws_security_group.jenkins.id # Allow traffic from Jenkins SG
 }
-# resource "aws_vpc_security_group_ingress_rule" "jenkins_sonar_access" {
-#   security_group_id = aws_security_group.sonar_qube.id
-#   # source_security_group_id       = [aws_security_group.jenkins.id]
-#   from_port         = var.sonar_port
-#   to_port           = var.sonar_port
-#   ip_protocol       = var.ip_protocol_name
-# }
+
 # SonarQube egress rule (allow all outbound traffic)
 resource "aws_vpc_security_group_egress_rule" "sonar_egress_rule" {
   security_group_id = aws_security_group.sonar_qube.id
@@ -270,11 +182,7 @@ resource "aws_vpc_security_group_egress_rule" "sonar_egress_rule" {
 resource "aws_instance" "sonar_qube_instance" {
   ami           = var.amis[0]
   instance_type = var.inst_type[0]
-  # subnet_id     = data.aws_subnet.pub_subnet.id
-  # subnet_id     = aws_subnet.pub_subnet.id
   subnet_id = var.pub_subnet
-  #   security_groups = aws_security_group.jenkins.id
-  # vpc_security_group_ids = data.aws_security_group.sonar_qube.id
   vpc_security_group_ids = [aws_security_group.sonar_qube.id]
   key_name               = var.key_pair_name
 
@@ -304,8 +212,6 @@ resource "aws_instance" "sonar_qube_instance" {
 resource "aws_security_group" "jump_host" {
   name        = "${var.environment}-${var.jump_host_sg_name}-SG"
   description = "Allow Jump Host for SSH"
-  # vpc_id      = data.aws_vpc.vpc_main.id
-  # vpc_id      = aws_vpc.vpc_main.id
   vpc_id = var.vpc_id
 
   tags = {
@@ -334,10 +240,7 @@ resource "aws_vpc_security_group_egress_rule" "jump_host_egress" {
 resource "aws_instance" "jump_host_instance" {
   ami           = var.amis[0]
   instance_type = var.inst_type[1]
-  # subnet_id     = data.aws_subnet.pub_subnet.id
-  # subnet_id     = aws_subnet.pub_subnet.id
   subnet_id = var.pub_subnet
-  #   security_groups = aws_security_group.jenkins.id
   vpc_security_group_ids = [aws_security_group.jump_host.id]
   key_name               = var.key_pair_name
 

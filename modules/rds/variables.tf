@@ -52,10 +52,6 @@ variable "engine_version" {
 }
 
 
-# Backend file variable
-
-
-
 
 
 # DynamoDB TF_file variables

@@ -1,8 +1,10 @@
 provider "aws" {
   region = var.region
 }
-
+# -------------------------------------------------------------------
+# This S3 bucket is used to store the terraform state file
 # Terraform State Files Storing Bucket for All Different Environment
+# -------------------------------------------------------------------
 resource "aws_s3_bucket" "s3_tf_state_file" {
   bucket = "${lower(var.bucket)}-vnc"
 
@@ -15,10 +17,7 @@ resource "aws_s3_bucket" "s3_tf_state_file" {
   # }
 }
 
-# resource "aws_s3_bucket_acl" "visibility_of_content" {
-#   bucket = aws_s3_bucket.s3_tf_state_file.id
-#   acl    = var.visibility
-# }
+
 resource "aws_s3_bucket_versioning" "bucket_version" {
   bucket = aws_s3_bucket.s3_tf_state_file.id
   versioning_configuration {
@@ -27,8 +26,10 @@ resource "aws_s3_bucket_versioning" "bucket_version" {
 }
 
 
-
-# Test Report files bucket 
+# -------------------------------------------------------------------
+# This S3 bucket is used to store the Jenkins Test Report files
+# Terraform Test Report Files Storing Bucket for All Different Environment
+# -------------------------------------------------------------------
 resource "aws_s3_bucket" "report_storing" {
   bucket = "${lower(var.environment)}-test-reports-chatapp"
 
@@ -41,11 +42,6 @@ resource "aws_s3_bucket" "report_storing" {
     Environment = var.environment
   }
 }
-
-# resource "aws_s3_bucket_acl" "visibility_of_report" {
-#   bucket = aws_s3_bucket.report_storing.id
-#   acl    = var.visibility
-# }
 
 resource "aws_s3_bucket_versioning" "report_storing_version" {
   bucket = aws_s3_bucket.report_storing.id
@@ -63,25 +59,3 @@ resource "aws_s3_bucket_public_access_block" "disable_public_block" {
   restrict_public_buckets = false
 }
 
-# resource "aws_s3_bucket_policy" "report_file_access_policy" {
-#   bucket = aws_s3_bucket.report_storing.id
-#   policy = jsonencode(
-#     {
-#       "Version" : "2012-10-17",
-#       "Statement" : [
-#         {
-#           "Effect" : "Allow",
-#           "Principal" : "*",
-#           "Action" : [
-#             "s3:GetObject",
-#             "s3:ListBucket"
-#           ],
-#           "Resource" : [
-#             "${aws_s3_bucket.report_storing.arn}",  # Bucket ARN
-#             "${aws_s3_bucket.report_storing.arn}/*" # Object ARN within the bucket
-#           ]
-#         }
-#       ]
-#     }
-#   )
-# }

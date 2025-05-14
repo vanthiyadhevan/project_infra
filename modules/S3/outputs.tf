@@ -46,9 +46,6 @@ output "bucket_url_for_report" {
   description = "bucket url for report file"
   value       = "https://${aws_s3_bucket.report_storing.bucket}.s3.amazonaws.com"
 }
-# output "bucket_policy_for_report_file" {
-#   description = "bucket policy for report file"
-#   value       = aws_s3_bucket.report_storing.policy
-# }
+
 
 

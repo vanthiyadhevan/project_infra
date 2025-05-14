@@ -8,11 +8,9 @@ output "vpc_cidr" {
 }
 output "pvt_subnet" {
   value = [for subnet in aws_subnet.pvt_subnet : subnet.id]
-  # value       = aws_subnet.pvt_subnet[*].id
   description = "list of private subnet ID's"
 }
 output "pub_subnet" {
-  # value       = aws_subnet.pub_subnet[*].id
   value       = [for subnet in aws_subnet.pub_subnet : subnet.id]
   description = "list of public subnet ID's"
 }
@@ -39,7 +37,4 @@ output "nat_gateway_id" {
   description = "nat gateway id"
 }
 
-# output "public_subnet" {
-#   value = var.pub_subnet_cidr
-# }
 

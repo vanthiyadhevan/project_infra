@@ -49,20 +49,6 @@ resource "aws_subnet" "pvt_subnet" {
 }
 
 
-# Subnet Group Creation For RDS 
-# Private Subnet Group
-resource "aws_db_subnet_group" "pvt_db_subnet_grp" {
-  name       = var.db_subnet_grp_name
-  subnet_ids = (aws_subnet.pvt_subnet[*].id)
-
-  tags = {
-    Name        = "${var.environment}-db-subnet-grp"
-    Environment = var.environment
-  }
-}
-
-
-
 # Internet Gateway(IGW) Creation
 resource "aws_internet_gateway" "IGW" {
   vpc_id = aws_vpc.vpc_main.id
@@ -82,10 +68,6 @@ resource "aws_route_table" "pub_route_table" {
     cidr_block = var.route_table_route_cidr
     gateway_id = aws_internet_gateway.IGW.id
   }
-  # route  {
-  #   cidr_block = "::/0"
-  #   egress_only_gateway_id = 
-  # }
   tags = {
     Name        = "${var.environment}-public-RT"
     Environment = var.environment
@@ -105,19 +87,13 @@ resource "aws_route_table" "pvt_route_table" {
   }
 }
 
-# Route For Nat Gateway
-# resource "aws_route" "private_route_for_nat_gateway" {
-#   route_table_id         = aws_route_table.pvt_route_table.id
-#   destination_cidr_block = var.route_table_route_cidr
-#   nat_gateway_id         = ""
-# }
+
 
 # Route Table Association For Both Public And Private
 # Public Route Table Association
 resource "aws_route_table_association" "pub_subet_association" {
   count     = length(aws_subnet.pub_subnet)
   subnet_id = aws_subnet.pub_subnet[count.index].id
-  # subnet_id      = aws_subnet.pub_subnet.id
   route_table_id = aws_route_table.pub_route_table.id
 }
 
@@ -125,20 +101,17 @@ resource "aws_route_table_association" "pub_subet_association" {
 resource "aws_route_table_association" "pvt_subet_association" {
   count     = length(aws_subnet.pvt_subnet)
   subnet_id = aws_subnet.pvt_subnet[count.index].id
-  # subnet_id      = aws_subnet.pvt_subnet.id
   route_table_id = aws_route_table.pvt_route_table.id
 }
 
 # EIP Creation
 resource "aws_eip" "for_nat_gateway" {
-  # vpc = true
   domain = "vpc"
 }
 
 # Nat Gateway Creation
 resource "aws_nat_gateway" "pvt_nat_gateway" {
   allocation_id = aws_eip.for_nat_gateway.id
-  # subnet_id     = aws_subnet.pub_subnet.id
   subnet_id = aws_subnet.pub_subnet[0].id
 
   tags = {

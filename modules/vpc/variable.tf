@@ -55,10 +55,3 @@ variable "route_table_route_cidr" {
 }
 
 
-# RDS SUBNET GROUP CREATION 
-variable "db_subnet_grp_name" {
-  type        = string
-  default     = "main_db_subnet_grp"
-  description = "db subnet group name"
-}
-
